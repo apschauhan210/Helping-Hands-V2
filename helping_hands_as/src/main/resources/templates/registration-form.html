@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+<!--    <link rel="stylesheet"-->
+<!--          href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"-->
+<!--          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"-->
+<!--          crossorigin="anonymous"/>-->
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <title>Registration</title>
+</head>
+<body>
+<div class="">
+
+    <div class="container mx-auto py-8">
+        <h1 class="text-2xl font-bold mb-6 text-center">Registration Form</h1>
+        <form th:action="@{/user/register-action}" th:object="${user}" method="POST" class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="first-name">First Name</label>
+                <input class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+                       type="text" id="first-name" th:field="*{firstName}" placeholder="John">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="last-name">Last Name</label>
+                <input class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+                       type="text" id="last-name" th:field="*{lastName}" placeholder="Doe">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="username">Email</label>
+                <input class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+                       type="email" id="username" th:field="*{username}" placeholder="john@example.com">
+                <p id="username-error" hidden class="mt-2 text-sm text-red-600 dark:text-red-500">
+<!--                    <span class="font-medium"></span> -->
+                    Email already taken!
+                </p>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
+                <input class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+                       type="password" id="password" th:field="*{password}" placeholder="********">
+            </div>
+            <button
+                    class="w-full bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md hover:bg-indigo-600 transition duration-300"
+                    type="submit">Register</button>
+            <input type="text" hidden th:field="*{role}">
+        </form>
+    </div>
+
+
+</div>
+
+
+<script>
+    const paramString = window.location.search;
+    const params = paramString.substring(1).split("&");
+    let error;
+    for (let i = 0; i < params.length; i++) {
+        const param = params[i];
+        const paramMap = param.split("=");
+        const key = paramMap[0];
+        const value = paramMap[1];
+        if (key === "error" && value === "true") {
+            error = {
+                status: true
+            }
+        }
+        if (key === "err_code" && value === "duplicate") {
+            if (error && error.status === true) {
+                const error = document.getElementById("username-error");
+                error.hidden = false;
+                break;
+            }
+        }
+    }
+
+    $(document).ready(function () {
+        $("#username").change(function () {
+            $("#username-error").hide();
+        });
+    });
+</script>
+</body>
+</html>
