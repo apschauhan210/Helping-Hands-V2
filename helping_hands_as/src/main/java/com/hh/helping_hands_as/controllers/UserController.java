@@ -15,10 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashSet;
-import java.util.Set;
 
 @Controller
 @RequestMapping("/user")
@@ -30,16 +30,23 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/register")
-    public ModelAndView registerUserForm(@RequestParam String role, @RequestParam(required = false) Boolean error, @RequestParam(required = false) String err_code) {
+    public ModelAndView registerUserForm(
+                                            @RequestParam String role,
+                                            @RequestParam(required = false) Boolean error,
+                                            @RequestParam(required = false) String err_code,
+                                            @RequestParam(required = false) String redirect_to
+                                        ) throws UnsupportedEncodingException {
         ModelAndView mav = new ModelAndView("registration-form");
         UserDto userDto = new UserDto();
         userDto.setRole(role);
         mav.addObject("user", userDto);
+        String defaultRedirectUrl = "/login";
+        mav.addObject("redirect_to", redirect_to != null ? URLEncoder.encode(redirect_to, "UTF-8") : defaultRedirectUrl);
         return mav;
     }
 
     @PostMapping("/register-action")
-    public ModelAndView registerUser(@ModelAttribute UserDto user) {
+    public ModelAndView registerUser(@ModelAttribute UserDto user, @RequestParam String redirect_to) {
         User newUser = new User(user.getUsername(), passwordEncoder.encode(user.getPassword()), user.getFirstName(), user.getLastName());
         newUser.setAuthorities(new HashSet<>());
         newUser.getAuthorities().add(new Authority("ROLE_" + user.getRole()));
@@ -47,7 +54,7 @@ public class UserController {
         ModelAndView mav = new ModelAndView();
         try {
             userDetailsManager.createUser(userDetails);
-            mav.setViewName("redirect:/login");
+            mav.setViewName("redirect:" + redirect_to);
             return mav;
         } catch (IllegalStateException e) {
             logger.warn(e.getMessage());
@@ -55,6 +62,9 @@ public class UserController {
             mav.addObject("role", "helper");
             mav.addObject("error", true);
             mav.addObject("err_code", "duplicate");
+            if(redirect_to != null) {
+                mav.addObject("redirect_to", redirect_to);
+            }
             return mav;
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,7 +75,7 @@ public class UserController {
     }
 
     @PutMapping("/change_password")
-    public ResponseEntity changePassword(@RequestParam String oldPassword, @RequestParam String newPassword, Authentication authentication) {
+    public ResponseEntity changePassword(@RequestParam String oldPassword, @RequestParam String newPassword) {
         userDetailsManager.changePassword(oldPassword, newPassword);
         return new ResponseEntity("Password updated successfully!", HttpStatus.OK);
     }

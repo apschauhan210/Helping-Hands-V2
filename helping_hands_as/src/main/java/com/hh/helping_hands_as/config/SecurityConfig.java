@@ -1,11 +1,13 @@
 package com.hh.helping_hands_as.config;
 
+import com.hh.helping_hands_as.config.utils.CorsCustomizer;
 import com.hh.helping_hands_as.security.SecurityUser;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -33,7 +35,10 @@ import java.util.UUID;
 
 @Configuration
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final CorsCustomizer corsCustomizer;
 
     @Bean
     @Order(1)
@@ -47,6 +52,8 @@ public class SecurityConfig {
             e.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"));
         });
 
+        corsCustomizer.corsCustomizer(http);
+
         return http.build();
     }
 
@@ -54,13 +61,13 @@ public class SecurityConfig {
     @Order(2)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                .formLogin(Customizer.withDefaults())
-//                .formLogin(e -> {                                 // custom login page
-//                    e.loginPage("/login");
-//                    e.loginProcessingUrl("/process-login");
-//                    e.defaultSuccessUrl("/", true);
-//                    e.failureUrl("/login.html?error=true");
-//                })
+//                .formLogin(Customizer.withDefaults())
+                .formLogin(e -> {                                 // custom login page
+                    e.loginPage("/login");
+                    e.loginProcessingUrl("/process-login");
+                    e.defaultSuccessUrl("/", false);
+                    e.failureUrl("/login?error=true");
+                })
 //                .logout(e -> {                                    // custom logout handling
 //                    e.logoutUrl("/logout");
 //                    e.deleteCookies("JSESSIONID");
@@ -71,6 +78,8 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests().requestMatchers("/client/register/**", "/user/change_password", "/secured/**").authenticated()
                 .anyRequest().permitAll();
+
+        corsCustomizer.corsCustomizer(http);
 
         return http.build();
     }

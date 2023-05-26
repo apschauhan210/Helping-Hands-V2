@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+    <title>Login</title>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto py-8">
+        <h1 class="text-2xl font-bold mb-6 text-center">Login</h1>
+        <form name='f' action="process-login" method='POST' class="w-full max-w-sm mx-auto bg-white p-8 rounded-md shadow-md">
+            <div id="bad-credentials" hidden class="mb-4 text-center">
+                <div class="w-full px-3 py-2 border border-red-400 rounded-md bg-red-200"
+                >
+                    Bad Credentials!
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="username">Username</label>
+                <input class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+                       type="text" id="username" name='username' value='' placeholder="John">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
+                <input class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-indigo-500"
+                       type="password" id="password" name='password' value='' placeholder="********">
+            </div>
+            <div class="mb-6">
+            <button
+                    class="w-full bg-indigo-500 text-white text-sm font-bold py-2 px-4 rounded-md hover:bg-indigo-600 transition duration-300"
+                    name="submit" value="submit" type="submit">Sign In</button>
+            </div>
+            <div class="grid grid-cols-2">
+                <div class="mb-4 component-center">
+                    <a th:href="@{/user/register?role=helper&redirect_to=__${redirect_to}__}"
+                            class="w-full bg-pink-600 text-white text-sm font-bold py-[0.6rem] px-4 rounded-md hover:bg-pink-700 transition duration-300"
+                            >Register(Helper)</a>
+                </div>
+                <div class="mb-4">
+                    <a th:href="@{/user/register?role=employer&redirect_to=__${redirect_to}__}"
+                            class="w-full bg-pink-600 text-white text-sm font-bold py-[0.6rem] px-4 rounded-md hover:bg-pink-700 transition duration-300"
+                            >Register(Employer)</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    <script>
+        const paramString = window.location.search;
+        const params = paramString.substring(1).split("&");
+        let error;
+        for (let i = 0; i < params.length; i++) {
+            const param = params[i];
+            const paramMap = param.split("=");
+            const key = paramMap[0];
+            const value = paramMap[1];
+            if (key === "error") {
+                const error = document.getElementById("bad-credentials");
+                error.hidden = false;
+                break;
+            }
+        }
+
+        $(document).ready(function () {
+            $("#username").change(function () {
+                $("#bad-credentials").hide();
+            });
+        });
+    </script>
+
+</body>
+</html>
