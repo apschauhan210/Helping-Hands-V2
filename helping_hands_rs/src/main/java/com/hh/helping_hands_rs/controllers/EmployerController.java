@@ -3,6 +3,7 @@ package com.hh.helping_hands_rs.controllers;
 import com.hh.helping_hands_rs.dtos.EmployerDto;
 import com.hh.helping_hands_rs.dtos.HelperDto;
 import com.hh.helping_hands_rs.entities.Employer;
+import com.hh.helping_hands_rs.entities.Job;
 import com.hh.helping_hands_rs.services.EmployerService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -36,8 +37,7 @@ public class EmployerController {
             EmployerDto employerDto = new EmployerDto(
                     employer.getEmail(),
                     employer.getName(),
-                    employer.getMobileNumber(),
-                    null
+                    employer.getMobileNumber()
             );
             return new ResponseEntity(employerDto, HttpStatus.OK);
         } catch (UsernameNotFoundException e) {
@@ -51,7 +51,7 @@ public class EmployerController {
     }
 
     @GetMapping("/requested-helpers")
-    @PreAuthorize("hasRole('employer')")
+    @PreAuthorize("hasRole(@Role.EMPLOYER)")
     public ResponseEntity getRequestedHelpers(Authentication authentication) {
         try {
             String email = authentication.getName();
@@ -63,8 +63,7 @@ public class EmployerController {
                                     helper.getName(),
                                     helper.getMobileNumber(),
                                     helper.getAddressToWork(),
-                                    null,
-                                    helper.getJobs()
+                                    helper.getJobs().stream().map(Job::getName).collect(Collectors.toSet())
                             )).collect(Collectors.toSet());
             return new ResponseEntity(helpers, HttpStatus.OK);
         } catch (UsernameNotFoundException e) {

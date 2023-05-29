@@ -1,5 +1,6 @@
 package com.hh.helping_hands_rs.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hh.helping_hands_rs.models.Address;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -47,6 +48,7 @@ public class Helper {
             joinColumns = @JoinColumn(name = "helper_id"),
             inverseJoinColumns = @JoinColumn(name = "job_id")
     )
+//    @JsonIgnore
     private Set<Job> jobs;
 
     public Helper(String email, String name, String mobileNumber, Set<Address> addressToWork, Set<Employer> offeringEmployers, Set<Job> jobs) {

@@ -1,5 +1,6 @@
 package com.hh.helping_hands_rs.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,5 +25,10 @@ public class Job {
     private String name;
 
     @ManyToMany(mappedBy = "jobs", fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Helper> helpers;
+
+    public Job(String name) {
+        this.name = name;
+    }
 }

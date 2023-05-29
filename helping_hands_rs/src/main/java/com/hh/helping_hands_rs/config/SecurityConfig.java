@@ -30,7 +30,7 @@ public class SecurityConfig {
                         .jwtAuthenticationConverter(jwtAuthenticationConverter)
         );
 
-        http.authorizeHttpRequests().anyRequest().authenticated();
+        http.authorizeHttpRequests().anyRequest().permitAll();
 
         corsCustomizer.corsCustomizer(http);
 

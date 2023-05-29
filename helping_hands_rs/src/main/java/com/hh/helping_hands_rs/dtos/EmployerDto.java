@@ -14,5 +14,5 @@ public class EmployerDto {
     private String email;
     private String name;
     private String mobileNumber;
-    private Set<HelperDto> requestedHelpers;
+//    private Set<HelperDto> requestedHelpers;
 }

@@ -17,6 +17,6 @@ public class HelperDto {
     private String name;
     private String mobileNumber;
     private Set<Address> addressToWork;
-    private Set<EmployerDto> offeringEmployers;
-    private Set<Job> jobs;
+//    private Set<EmployerDto> offeringEmployers;
+    private Set<String> jobs;
 }
