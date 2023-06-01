@@ -108,11 +108,26 @@ public class HelperService {
     @Transactional
     public void addOfferingEmployer(String helperEmail, String employerEmail) {
         Employer employer = employerService.findEmployerByEmail(employerEmail);
-        Helper helper = helperRepository.findHelperByEmail(helperEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("Helper with email " + helperEmail + " does not exist"));
+        Helper helper = findHelperByEmail(helperEmail);
         if(helper.getOfferingEmployers() == null) {
             helper.setOfferingEmployers(new HashSet<>());
         }
         helper.getOfferingEmployers().add(employer);
+    }
+
+    public Set<Helper> getHelpersByLocationAndJobs(Address address, String jobName) {
+        Optional<Job> job = jobRepository.findJobByName(jobName);
+        if(job.isPresent()) {
+            Optional<List<Helper>> optionalHelpers = helperRepository.findHelpersByAddressToWorkAndJob(address, job.get());
+            if(optionalHelpers.isPresent())
+                return new HashSet<>(optionalHelpers.get());
+        }
+        else {
+            Job newJob = new Job(jobName);
+            jobRepository.save(newJob);
+//                jobs.add(newJob);
+        }
+
+        return new HashSet<>();
     }
 }

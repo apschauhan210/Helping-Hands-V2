@@ -2,6 +2,7 @@ package com.hh.helping_hands_rs.controllers;
 
 import com.hh.helping_hands_rs.dtos.EmployerDto;
 import com.hh.helping_hands_rs.dtos.HelperDto;
+import com.hh.helping_hands_rs.dtos.LocationAndJobsDto;
 import com.hh.helping_hands_rs.entities.Helper;
 import com.hh.helping_hands_rs.entities.Job;
 import com.hh.helping_hands_rs.models.Address;
@@ -154,10 +155,10 @@ public class HelperController {
     }
 
     @PostMapping("/add-offering-employer")
-    @PreAuthorize("hasRole(@Role.HELPER)")
-    public ResponseEntity addOfferingEmployer(@RequestParam String employerEmail, Authentication authentication) {
+    @PreAuthorize("hasRole(@Role.EMPLOYER)")
+    public ResponseEntity addOfferingEmployer(@RequestParam String helperEmail, Authentication authentication) {
         try {
-            String helperEmail = authentication.getName();
+            String employerEmail = authentication.getName();
             helperService.addOfferingEmployer(helperEmail, employerEmail);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (UsernameNotFoundException e) {
@@ -167,6 +168,30 @@ public class HelperController {
             logger.error(e.getMessage());
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/helpers-by-location-and-jobs")
+    @PreAuthorize("hasRole(@Role.EMPLOYER)")
+    public ResponseEntity<List<HelperDto>> getHelpersByLocationAndJobs(@RequestBody LocationAndJobsDto requestBody) {
+        try {
+            if(requestBody.address == null || requestBody.job == null) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            Set<Helper> helperSet = helperService.getHelpersByLocationAndJobs(requestBody.address, requestBody.job);
+            List<HelperDto> helpers = helperSet.stream()
+                    .map(helper -> new HelperDto(
+                            helper.getEmail(),
+                            helper.getName(),
+                            helper.getMobileNumber(),
+                            helper.getAddressToWork(),
+                            helper.getJobs().stream().map(Job::getName).collect(Collectors.toSet())
+                    )).toList();
+            return new ResponseEntity<>(helpers, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

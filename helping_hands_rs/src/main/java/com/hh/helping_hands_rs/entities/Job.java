@@ -2,10 +2,7 @@ package com.hh.helping_hands_rs.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Set;
 
@@ -14,6 +11,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class Job {
 
     @Id

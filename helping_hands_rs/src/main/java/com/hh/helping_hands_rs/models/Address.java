@@ -1,10 +1,7 @@
 package com.hh.helping_hands_rs.models;
 
 import jakarta.persistence.Embeddable;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Arrays;
 
@@ -13,6 +10,7 @@ import java.util.Arrays;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class Address {
 
     private String location;
