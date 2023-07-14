@@ -68,11 +68,11 @@ public class SecurityConfig {
                     e.defaultSuccessUrl("/", false);
                     e.failureUrl("/login?error=true");
                 })
-//                .logout(e -> {                                    // custom logout handling
-//                    e.logoutUrl("/logout");
-//                    e.deleteCookies("JSESSIONID");
-//                    e.logoutSuccessUrl("/");
-//                })
+                .logout(e -> {                                    // custom logout handling
+                    e.logoutUrl("/logout");
+                    e.deleteCookies("JSESSIONID");
+                    e.logoutSuccessUrl("/");
+                })
                 .httpBasic()
                 .and()
                 .csrf().disable()
@@ -124,7 +124,7 @@ public class SecurityConfig {
             List<GrantedAuthority> authorityList = (List<GrantedAuthority>) context.getPrincipal().getAuthorities();
             context.getClaims().claim("authorities", authorityList.stream().map(GrantedAuthority::getAuthority).toList());
 
-            if(context.getPrincipal().getPrincipal().getClass().equals(SecurityUser.class)) {
+            if (context.getPrincipal().getPrincipal().getClass().equals(SecurityUser.class)) {
                 SecurityUser authenticatedUser = (SecurityUser) context.getPrincipal().getPrincipal();
                 context.getClaims().claim("fname", authenticatedUser.getUser().getFirstName());
                 context.getClaims().claim("lname", authenticatedUser.getUser().getLastName());

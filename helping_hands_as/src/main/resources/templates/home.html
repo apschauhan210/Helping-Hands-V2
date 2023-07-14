@@ -5,18 +5,21 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>APS Authorization Server</title>
 </head>
-<body>
-    <h1>Welcome to demo page</h1>
-    <a href="/login">Login</a>
-    <br>
-    <a href="/user/register?role=helper">Register(Helper)</a>
-    <br>
-    <a href="/user/register?role=employer">Register(Employer)</a>
-    <br>
-    <a href="/logout">Logout</a>
-    <br>
-    <a href="/secured">Secured</a>
+<body class="bg-gray-100 mx-auto p-4">
+    <h1 class="text-2xl font-bold">APS Authorization Server</h1>
+    <div class="mt-2">
+        <a class="text-base underline decoration-sky-600 hover:decoration-sky-500 hover:text-rose-700 text-gray-800" href="/login?fromAS=true">Login</a>
+        <br>
+        <a class="text-base underline decoration-sky-600 text-gray-800 hover:decoration-sky-500 hover:text-rose-700" href="/user/register?role=helper">Register(Helper)</a>
+        <br>
+        <a class="text-base underline decoration-sky-600 text-gray-800 hover:decoration-sky-500 hover:text-rose-700" href="/user/register?role=employer">Register(Employer)</a>
+        <br>
+        <a class="text-base underline decoration-sky-600 text-gray-800 hover:decoration-sky-500 hover:text-rose-700" href="/logout">Logout</a>
+        <br>
+        <a class="text-base underline decoration-sky-600 text-gray-800 hover:decoration-sky-500 hover:text-rose-700" href="/secured">Secured</a>
+    </div>
 </body>
 </html>
