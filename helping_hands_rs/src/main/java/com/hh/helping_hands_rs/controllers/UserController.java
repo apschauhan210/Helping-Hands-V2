@@ -29,7 +29,7 @@ public class UserController {
     private final static Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @PostMapping("/register")
-    @PreAuthorize("hasAnyRole('helper', 'employer')")
+    @PreAuthorize("hasAnyRole(@Role.HELPER, @Role.EMPLOYER)")
     public ResponseEntity registerUser(Authentication authentication) {
         try {
             List<? extends GrantedAuthority> authorities = (List<? extends GrantedAuthority>) authentication.getAuthorities();

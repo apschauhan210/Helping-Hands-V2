@@ -31,7 +31,8 @@ public class EmployerController {
     private final static Logger logger = LoggerFactory.getLogger(EmployerController.class);
 
     @GetMapping()
-    public ResponseEntity getHelperByEmail(@RequestParam String email) {
+    @PreAuthorize("hasAnyRole(@Role.EMPLOYER, @Role.HELPER)")
+    public ResponseEntity getEmployerByEmail(@RequestParam String email) {
         try {
             Employer employer = employerService.findEmployerByEmail(email);
             EmployerDto employerDto = new EmployerDto(

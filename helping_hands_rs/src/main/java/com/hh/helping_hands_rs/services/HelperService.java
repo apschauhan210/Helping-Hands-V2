@@ -34,7 +34,14 @@ public class HelperService {
         Jwt principal = (Jwt) authentication.getPrincipal();
         Map<String, Object> claims = principal.getClaims();
         String name = claims.get("fname") + " " + claims.get("lname");
-        Helper helper = new Helper(authentication.getName(), name, null, new HashSet<>(), new HashSet<>(), new HashSet<>());
+        Helper helper = new Helper(
+                authentication.getName(),   // email(username) is the name in authentication object
+                name,
+                null,
+                new HashSet<>(),
+                new HashSet<>(),
+                new HashSet<>()
+        );
         Optional<Helper> helperByEmail = helperRepository.findHelperByEmail(helper.getEmail());
         if (helperByEmail.isEmpty())
             helperRepository.save(helper);
@@ -44,7 +51,7 @@ public class HelperService {
     public void addHelpersWorkingLocation(String email, Address address) {
         Helper helper = this.findHelperByEmail(email);
 
-        if(helper.getAddressToWork() == null) {
+        if (helper.getAddressToWork() == null) {
             helper.setAddressToWork(new HashSet<>());
         }
 
@@ -54,27 +61,20 @@ public class HelperService {
     public Set<Helper> getHelperByLocation(Address address) {
         Set<Helper> resHelpers = new LinkedHashSet<>();
 
-        Optional<List<Helper>> optionalHelpersWithExactLocation = helperRepository.findHelpersByAddressToWork(address);
-        if(optionalHelpersWithExactLocation.isPresent()) {
-            resHelpers.addAll(optionalHelpersWithExactLocation.get());
-        }
+        helperRepository.findHelpersByAddressToWork(address)
+                .ifPresent(resHelpers::addAll);
 
-        Optional<List<Helper>> optionalHelpersWithApproxLocation = helperRepository.findHelpersByAddressToWorkExcludingLocation(address);
-        if(optionalHelpersWithApproxLocation.isPresent()) {
-            resHelpers.addAll(optionalHelpersWithApproxLocation.get());
-        }
+        helperRepository.findHelpersByAddressToWorkExcludingLocation(address)
+                .ifPresent(resHelpers::addAll);
 
-        Optional<List<Helper>> optionalHelpersWithinSameCity = helperRepository.findHelpersByAddressToWorkWithCityAndState(address);
-        if(optionalHelpersWithinSameCity.isPresent()) {
-            resHelpers.addAll(optionalHelpersWithinSameCity.get());
-        }
+        helperRepository.findHelpersByAddressToWorkWithCityAndState(address)
+                .ifPresent(resHelpers::addAll);
 
         return resHelpers;
     }
 
     public Set<Address> getWorkingLocations(String helperEmail) {
-        Helper helperByEmail = helperRepository.findHelperByEmail(helperEmail)
-                                            .orElseThrow(() -> new UsernameNotFoundException("Helper with email " + helperEmail + " is not found"));
+        Helper helperByEmail = this.findHelperByEmail(helperEmail);
         return helperByEmail.getAddressToWork();
     }
 
@@ -82,11 +82,11 @@ public class HelperService {
     public void addHelpersJob(String email, List<String> jobNames) {
         Helper helper = findHelperByEmail(email);
 
-        if(helper.getJobs() == null) {
+        if (helper.getJobs() == null) {
             helper.setJobs(new HashSet<>());
         }
 
-        for(String jobName: jobNames) {
+        for (String jobName : jobNames) {
             Optional<Job> job = jobRepository.findJobByName(jobName);
             if (job.isPresent()) {
                 helper.getJobs().add(job.get());
@@ -99,7 +99,7 @@ public class HelperService {
     public List<String> getHelpersJob(String email) {
         Helper helper = findHelperByEmail(email);
         Set<Job> jobs = helper.getJobs();
-        if(jobs != null) {
+        if (jobs != null) {
             return jobs.stream().map(Job::getName).toList();
         }
         return new ArrayList<>();
@@ -109,7 +109,7 @@ public class HelperService {
     public void addOfferingEmployer(String helperEmail, String employerEmail) {
         Employer employer = employerService.findEmployerByEmail(employerEmail);
         Helper helper = findHelperByEmail(helperEmail);
-        if(helper.getOfferingEmployers() == null) {
+        if (helper.getOfferingEmployers() == null) {
             helper.setOfferingEmployers(new HashSet<>());
         }
         helper.getOfferingEmployers().add(employer);
@@ -117,12 +117,11 @@ public class HelperService {
 
     public Set<Helper> getHelpersByLocationAndJobs(Address address, String jobName) {
         Optional<Job> job = jobRepository.findJobByName(jobName);
-        if(job.isPresent()) {
+        if (job.isPresent()) {
             Optional<List<Helper>> optionalHelpers = helperRepository.findHelpersByAddressToWorkAndJob(address, job.get());
-            if(optionalHelpers.isPresent())
+            if (optionalHelpers.isPresent())
                 return new HashSet<>(optionalHelpers.get());
-        }
-        else {
+        } else {
             Job newJob = new Job(jobName);
             jobRepository.save(newJob);
 //                jobs.add(newJob);

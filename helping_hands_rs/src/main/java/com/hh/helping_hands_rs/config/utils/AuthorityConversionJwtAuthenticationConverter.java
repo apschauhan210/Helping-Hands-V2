@@ -14,13 +14,11 @@ public class AuthorityConversionJwtAuthenticationConverter implements Converter<
 
     @Override
     public JwtAuthenticationToken convert(Jwt jwt) {
-        List<String> authorities = (List<String>) jwt.getClaim("authorities");
-        JwtAuthenticationToken jwtAuthentication =
-                new JwtAuthenticationToken(
-                        jwt,
-                        authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet())
-                );
+        List<String> authorities = jwt.getClaim("authorities");
 
-        return jwtAuthentication;
+        return new JwtAuthenticationToken(
+                jwt,
+                authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet())
+        );
     }
 }

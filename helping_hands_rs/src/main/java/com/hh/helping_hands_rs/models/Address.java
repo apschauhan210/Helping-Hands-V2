@@ -32,8 +32,10 @@ public class Address {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Address) {
-            Address e = (Address) obj;
+        if(obj == this)
+            return true;
+
+        if (obj instanceof Address e) {
             return (
                     location.equals(e.location) &&
                     city.equals(e.city) &&

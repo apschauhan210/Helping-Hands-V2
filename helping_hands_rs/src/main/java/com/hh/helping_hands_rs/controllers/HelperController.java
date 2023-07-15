@@ -30,6 +30,7 @@ public class HelperController {
     private final static Logger logger = LoggerFactory.getLogger(HelperController.class);
 
     @GetMapping
+    @PreAuthorize("hasAnyRole(@Role.EMPLOYER, @Role.HELPER)")
     public ResponseEntity getHelperByEmail(@RequestParam String email) {
         try {
             Helper helper = helperService.findHelperByEmail(email);
@@ -40,14 +41,14 @@ public class HelperController {
                     helper.getAddressToWork(),
                     helper.getJobs().stream().map(Job::getName).collect(Collectors.toSet())
             );
-            return new ResponseEntity(helperDto, HttpStatus.OK);
+            return new ResponseEntity<>(helperDto, HttpStatus.OK);
         } catch (UsernameNotFoundException e) {
             logger.error(e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
             logger.error(e.getMessage());
             e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -65,14 +66,14 @@ public class HelperController {
                                             employer.getName(),
                                             employer.getMobileNumber()
                                     )).collect(Collectors.toSet());
-            return new ResponseEntity(employers, HttpStatus.OK);
+            return new ResponseEntity<>(employers, HttpStatus.OK);
         } catch (UsernameNotFoundException e) {
             logger.error(e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
             logger.error(e.getMessage());
             e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -81,11 +82,11 @@ public class HelperController {
     public ResponseEntity<HttpStatus> addHelperWorkingLocation(@RequestBody Address address, Authentication authentication) {
         try {
             helperService.addHelpersWorkingLocation(authentication.getName(), address);
-            return new ResponseEntity(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             logger.error(e.getMessage());
             e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -94,20 +95,11 @@ public class HelperController {
     public ResponseEntity<List<HelperDto>> getHelpersByLocation(@RequestBody Address address) {
         try {
             Set<Helper> helpers = helperService.getHelperByLocation(address);
-            List<HelperDto> res = helpers.stream()
-                    .map(helper -> new HelperDto(
-                            helper.getEmail(),
-                            helper.getName(),
-                            helper.getMobileNumber(),
-                            helper.getAddressToWork(),
-                            helper.getJobs().stream().map(Job::getName).collect(Collectors.toSet())
-//                                                    null
-                    )).toList();
-            return new ResponseEntity(res, HttpStatus.OK);
+            return new ResponseEntity<>(convertHelperSetToHelperDTOList(helpers), HttpStatus.OK);
         } catch (Exception e) {
             logger.error(e.getMessage());
             e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -123,7 +115,7 @@ public class HelperController {
         } catch (Exception e) {
             logger.error(e.getMessage());
             e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -137,7 +129,7 @@ public class HelperController {
         } catch (Exception e) {
             logger.error(e.getMessage());
             e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -179,19 +171,22 @@ public class HelperController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
             Set<Helper> helperSet = helperService.getHelpersByLocationAndJobs(requestBody.address, requestBody.job);
-            List<HelperDto> helpers = helperSet.stream()
-                    .map(helper -> new HelperDto(
-                            helper.getEmail(),
-                            helper.getName(),
-                            helper.getMobileNumber(),
-                            helper.getAddressToWork(),
-                            helper.getJobs().stream().map(Job::getName).collect(Collectors.toSet())
-                    )).toList();
-            return new ResponseEntity<>(helpers, HttpStatus.OK);
+            return new ResponseEntity<>(convertHelperSetToHelperDTOList(helperSet), HttpStatus.OK);
         } catch (Exception e) {
             logger.error(e.getMessage());
             e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private List<HelperDto> convertHelperSetToHelperDTOList(Set<Helper> helperSet) {
+        return helperSet.stream()
+                .map(helper -> new HelperDto(
+                        helper.getEmail(),
+                        helper.getName(),
+                        helper.getMobileNumber(),
+                        helper.getAddressToWork(),
+                        helper.getJobs().stream().map(Job::getName).collect(Collectors.toSet())
+                )).toList();
     }
 }
